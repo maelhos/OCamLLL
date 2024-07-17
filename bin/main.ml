@@ -10,7 +10,7 @@ let () =
     [| 6. ; 2. ; 9. ; -5. |]
   ] in 
   let res = MatrixFloat.gram_schmidt (m :> MatrixFloat.mt)
-  in print_newline (); MatrixFloat.pp_matrix Format.pp_print_float (List.rev res)
+  in print_newline (); MatrixFloat.pp_matrix Format.pp_print_float res
 
 
 module MatrixQ = MakeMatrix(Q)
@@ -24,4 +24,4 @@ let () =
   ] in 
   let m_c = List.map (fun a -> Array.map (fun b -> Q.of_int b) a) m in
   let res = MatrixQ.gram_schmidt (m_c :> MatrixQ.mt)
-  in print_newline (); MatrixQ.pp_matrix Q.pp_print (List.rev res)
+  in print_newline (); MatrixQ.pp_matrix Q.pp_print res

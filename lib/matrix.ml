@@ -21,12 +21,13 @@ struct
         let new_vec = List.fold_left (fun acc uj -> acc - (uj </> vi)) vi vec_done in 
         step rest (new_vec :: vec_done)
       end
-    in step m []
+    in step m [] |> List.rev
   
   let pp_matrix (fmt : Format.formatter -> F.t -> unit) (m : mt) : unit =
         List.iter (fun v -> begin
           Format.print_string "[";
-          Array.iter (Format.printf "%a " fmt) v;
+          let v_len = Array.length v in
+          Array.iteri (fun i a -> Format.printf "%a" fmt a; if i < (Int.sub v_len 1) then Format.print_char ' ' else ()) v;
           Format.print_string "]\n"
         end) m
 end
