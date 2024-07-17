@@ -1,3 +1,4 @@
 (library
  (name OCamLLL)
- (modules ))
+ (modules gram_schmidt lll matrix vector)
+ (libraries zarith))
