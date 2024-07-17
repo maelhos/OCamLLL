@@ -1,6 +1,9 @@
-open Vector
-
-module type MakeMatrix = functor (F : Field) ->
+module type MakeMatrix = functor (F : Vector.Field) ->
 sig
-	type t = MakeVector(F).t array
+	type mt = F.t array list
+
+	val gram_schmidt : mt -> mt
+	val pp_matrix : (Format.formatter -> F.t -> unit) -> mt -> unit
 end
+
+module MakeMatrix : MakeMatrix

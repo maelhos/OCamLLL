@@ -4,17 +4,11 @@ module type Field = sig
 	val zero : t 
 	val one : t
 
-	val (+) : t -> t -> t 
-	val (-) : t -> t -> t
-	val ( * ) : t -> t -> t
-	val ( / ) : t -> t -> t
-	val (~-) : t -> t 
-	val (<) : t -> t -> bool 
-	val (>) : t -> t -> bool 
-	val (<=) : t -> t -> bool 
-	val (>=) : t -> t -> bool 
-	val (<>) : t -> t -> bool 
-	val (=) : t -> t -> bool
+	val add : t -> t -> t 
+	val sub : t -> t -> t
+	val mul : t -> t -> t
+	val div : t -> t -> t
+	val neg : t -> t
 end
 
 
@@ -31,3 +25,6 @@ sig
 end
 
 module MakeVector : MakeVector
+
+val pp_vector : (Format.formatter -> 'a -> unit) -> 'a array -> unit
+(* pretty printing for vectors. *)
