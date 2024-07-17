@@ -25,8 +25,8 @@ struct
   
   let pp_matrix (fmt : Format.formatter -> F.t -> unit) (m : mt) : unit =
         List.iter (fun v -> begin
-          print_string "[";
-          ignore (Array.iter (Format.printf "%a " fmt) v);
-          print_endline "]"
+          Format.print_string "[";
+          Array.iter (Format.printf "%a " fmt) v;
+          Format.print_string "]\n"
         end) m
 end

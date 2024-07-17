@@ -10,4 +10,4 @@ let () =
     [| 6. ; 2. ; 9. ; -5. |]
   ] in 
   let res = Matrix.gram_schmidt (m :> Matrix.mt)
-  in Matrix.pp_matrix Format.pp_print_float (List.rev res)
+  in print_newline (); Matrix.pp_matrix Format.pp_print_float (List.rev res)
