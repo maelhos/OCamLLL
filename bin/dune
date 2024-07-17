@@ -1,4 +1,4 @@
 (executable
  (public_name OCamLLL)
  (name main)
- (libraries OCamLLL))
+ (libraries OCamLLL zarith))
