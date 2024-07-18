@@ -34,8 +34,8 @@ struct
     Array.map2 F.sub v1 v2 
   
   let (<.>) (v1 : t) (v2 : t) : F.t =
-    let sum = v1 + v2 in 
-    Array.fold_left F.add F.zero sum
+    let products = Array.map2 F.mul v1 v2 in 
+    Array.fold_left F.add F.zero products
   
   let (~-) (v1 : t) : t =
     Array.map F.neg v1
