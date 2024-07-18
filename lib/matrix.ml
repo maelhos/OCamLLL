@@ -22,6 +22,26 @@ struct
         step (new_vec :: vec_done) rest
       end
     in m |> step [] |> List.rev
+
+  let lll (m : mt) ?(delta = F.one) : mt =
+    let n = List.length m in
+    let rec aux (basis : mt) (ortho : mt) : mt * mt =
+      begin
+      let mus = [] in
+      let mukkm1 = List.hd mus in
+      if (F.compare (norm new_ortho) (F.mul (F.mul mukkm1 mukkm1 |> F.sub delta) (ortho |> List.hd |> norm)) < 0) then
+        begin
+        let new_basis = List.hd basis :: new_vec :: List.tl basis in 
+        let new_ortho = List.hd ortho :: new_ortho :: List.tl ortho in
+        match new_basis with
+        | [_, _] -> aux new_basis new_ortho
+        | _ -> aux (List.tl new_basis) (List.tl new_ortho)
+        end
+      else
+        aux (new_vec :: basis) (new_ortho :: ortho)
+      end
+    in 
+    fst (aux m (gram_schmidt m))
   
   let pp_matrix ~sep (fmt : Format.formatter -> F.t -> unit) (m : mt) : unit =
         List.iter (fun v -> begin

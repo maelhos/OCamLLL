@@ -9,6 +9,7 @@ module type Field = sig
 	val mul : t -> t -> t
 	val div : t -> t -> t
 	val neg : t -> t
+	val compare : t -> t -> int
 end
 
 
@@ -21,6 +22,8 @@ sig
 	val (<.>) : t -> t -> F.t
 	val (~-) : t -> t
 	val ( * ) : F.t -> t -> t
+	val norm : t -> F.t
+	val ( <<>> ) : t -> t -> F.t
 	val ( </> ) : t -> t -> t
 end
 

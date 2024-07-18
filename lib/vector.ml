@@ -9,6 +9,7 @@ module type Field = sig
 	val mul : t -> t -> t
 	val div : t -> t -> t
 	val neg : t -> t
+  val compare : t -> t -> int
 end
 
 module type MakeVector = functor (F : Field) ->
@@ -20,6 +21,7 @@ sig
 	val (<.>) : t -> t -> F.t
 	val (~-) : t -> t
 	val ( * ) : F.t -> t -> t
+  val ( <<>> ) : t -> t -> F.t
   val ( </> ) : t -> t -> t
 end
 
@@ -43,8 +45,14 @@ struct
   let ( * ) (x : F.t) (v : t) =
     Array.map (F.mul x) v
 
+  let norm (x : t) : F.t =
+    x <.> x
+
+  let ( <<>> ) (v : t) (u : t) : F.t =
+    F.div (v <.> u) (norm u)
+
   let ( </> ) (v : t) (u : t) : t =
-    let lambda = F.div (v <.> u) (u <.> u) in
+    let lambda = v <<>> u in
     lambda * u
 end
 
