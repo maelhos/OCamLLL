@@ -18,8 +18,8 @@ struct
       match m with 
       | [] -> vec_done 
       | vi :: rest -> begin
-        let new_vec = List.fold_left (fun acc uj -> acc - (uj </> vi)) vi vec_done in 
-        step rest (new_vec :: vec_done)
+        let new_vec = List.fold_left (fun acc uj -> acc - (vi </> uj)) vi vec_done in 
+        step (new_vec :: vec_done) rest
       end
     in m |> step [] |> List.rev
   
