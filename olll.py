@@ -1,3 +1,4 @@
+from sage.all import matrix
 from fractions import Fraction
 from typing import List, Sequence
 
@@ -82,12 +83,6 @@ def gramschmidt(v: Sequence[Vector]) -> Sequence[Vector]:
 
 
 def reduction(basis: Sequence[Sequence[int]], delta: float) -> Sequence[Sequence[int]]:
-    """
-    >>> reduction([[1, 1, 1], [-1, 0, 2], [3, 5, 6]], 0.75)
-    [[0, 1, 0], [1, 0, 1], [-1, 0, 2]]
-    >>> reduction([[105, 821, 404, 328], [881, 667, 644, 927], [181, 483, 87, 500], [893, 834, 732, 441]], 0.75)
-    [[76, -338, -317, 172], [88, -171, -229, -314], [269, 312, -142, 186], [519, -299, 470, -73]]
-    """
     n = len(basis)
     basis = list(map(Vector, basis))
     ortho = gramschmidt(basis)
@@ -97,6 +92,9 @@ def reduction(basis: Sequence[Sequence[int]], delta: float) -> Sequence[Sequence
 
     k = 1
     while k < n:
+        print("nb :", basis[:k+1])
+        print("no :", ortho[:k+1])
+        print()
         for j in range(k - 1, -1, -1):
             mu_kj = mu(k, j)
             if abs(mu_kj) > 0.5:
@@ -112,11 +110,65 @@ def reduction(basis: Sequence[Sequence[int]], delta: float) -> Sequence[Sequence
 
     return [list(map(int, b)) for b in basis]
 
+def reduction_rec(basis: List[List[int]], delta: float) -> List[List[int]]:
+    n = len(basis)
+    basis = list(map(Vector, basis))
+    ortho = gramschmidt(basis)
+
+    k = 1
+    new_basis = basis[:2]
+    new_ortho = basis[:2]
+
+    zip_basis = basis[2:][::-1]
+    zip_ortho = basis[2:][::-1]
+
+    def mu(i: int, j: int) -> Fraction:
+        return new_ortho[j].proj_coff(new_basis[i])
+    
+    while k < n:
+        print("nb :", new_basis)
+        print("no :", new_ortho)
+        print()
+        for j in range(k - 1, -1, -1):
+            mu_kj = mu(k, j)
+            if abs(mu_kj) > 0.5:
+                new_basis[-1] -= new_basis[j] * round(mu_kj)
+                new_ortho = gramschmidt(new_basis)
+
+        if new_ortho[-1].sdot() >= (delta - mu(k, k - 1)**2) * new_ortho[-2].sdot():
+            k += 1
+            if k < n:
+                new_basis.append(zip_basis.pop())
+                new_ortho.append(zip_ortho.pop())
+        else:
+            new_basis[-1], new_basis[-2] = new_basis[-2], new_basis[-1]
+            new_ortho = gramschmidt(new_basis)
+            if k != 1:
+                zip_basis.append(new_basis.pop())
+                zip_ortho.append(new_ortho.pop())
+
+            k = max(k - 1, 1)
+
+    return [list(map(int, b)) for b in new_basis]
 
 # test 
 
 if __name__ == "__main__":
-    print(reduction([[4.0,1.0,3.0,-1.0], 
-                       [2.0,1.0,-3.0,4.0], 
-                       [1.0,0.0,-2.0,7.0], 
-                       [6.0, 2.0, 9.0, -5.0]]))
+    print(reduction([[4.0, 1.0, 3.0,-1.0], 
+                     [2.0, 1.0,-3.0, 4.0], 
+                     [1.0, 0.0,-2.0, 7.0], 
+                     [6.0, 2.0, 9.0,-5.0]], 
+                     1))
+    
+    print("##############")
+    print(reduction_rec([[4.0, 1.0, 3.0,-1.0], 
+                         [2.0, 1.0,-3.0, 4.0], 
+                         [1.0, 0.0,-2.0, 7.0], 
+                         [6.0, 2.0, 9.0,-5.0]], 
+                         1))
+    
+    print("##############")
+    print(list(matrix([[4, 1, 3,-1], 
+                         [2, 1,-3, 4], 
+                         [1, 0,-2, 7], 
+                         [6, 2, 9,-5]]).LLL()))
