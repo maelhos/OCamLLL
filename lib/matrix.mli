@@ -4,7 +4,7 @@ sig
 
 	val gram_schmidt : mt -> mt
 	val pp_matrix : sep:char -> (Format.formatter -> F.t -> unit) -> mt -> unit
-	val lll : mt -> ?delta:F.t -> mt
+	val lll : ?delta:F.t -> mt -> mt
 end
 
 module MakeMatrix : MakeMatrix

@@ -6,6 +6,7 @@ module type MakeMatrix = functor (F : Vector.Field) ->
   
     val gram_schmidt : mt -> mt 
     val pp_matrix : sep:char -> (Format.formatter -> F.t -> unit) -> mt -> unit
+    val lll : ?delta:F.t -> mt -> mt
   end
 
 module MakeMatrix (F : Field) =
@@ -23,25 +24,27 @@ struct
       end
     in m |> step [] |> List.rev
 
-  let lll (m : mt) ?(delta = F.one) : mt =
-    let n = List.length m in
-    let rec aux (basis : mt) (ortho : mt) : mt * mt =
+  let lll ?(delta = F.one) (basis : mt) : mt =
+    let _n = List.length basis in
+    let rec reduce (basis : mt) (ortho : mt) : mt * mt =
       begin
       let mus = [] in
       let mukkm1 = List.hd mus in
-      if (F.compare (norm new_ortho) (F.mul (F.mul mukkm1 mukkm1 |> F.sub delta) (ortho |> List.hd |> norm)) < 0) then
+      let new_basis_vec = [||] in
+      let new_ortho_vec = [||] in
+      if (F.compare (norm new_ortho_vec) (F.mul (F.mul mukkm1 mukkm1 |> F.sub delta) (ortho |> List.hd |> norm)) < 0) then
         begin
-        let new_basis = List.hd basis :: new_vec :: List.tl basis in 
-        let new_ortho = List.hd ortho :: new_ortho :: List.tl ortho in
+        let new_basis = List.hd basis :: new_basis_vec :: List.tl basis in 
+        let new_ortho = List.hd ortho :: new_ortho_vec :: List.tl ortho in
         match new_basis with
-        | [_, _] -> aux new_basis new_ortho
-        | _ -> aux (List.tl new_basis) (List.tl new_ortho)
+        | _ :: _ :: [] -> reduce new_basis new_ortho
+        | _ -> reduce (List.tl new_basis) (List.tl new_ortho)
         end
       else
-        aux (new_vec :: basis) (new_ortho :: ortho)
+        reduce (new_basis_vec :: basis) (new_ortho_vec :: ortho)
       end
     in 
-    fst (aux m (gram_schmidt m))
+    fst (reduce basis (gram_schmidt basis))
   
   let pp_matrix ~sep (fmt : Format.formatter -> F.t -> unit) (m : mt) : unit =
         List.iter (fun v -> begin

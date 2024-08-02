@@ -21,6 +21,7 @@ sig
 	val (<.>) : t -> t -> F.t
 	val (~-) : t -> t
 	val ( * ) : F.t -> t -> t
+  val norm : t -> F.t
   val ( <<>> ) : t -> t -> F.t
   val ( </> ) : t -> t -> t
 end
