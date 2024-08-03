@@ -92,6 +92,7 @@ def reduction(basis: Sequence[Sequence[int]], delta: float) -> Sequence[Sequence
 
     k = 1
     while k < n:
+        print("k :", k)
         print("nb :", basis[:k+1])
         print("no :", ortho[:k+1])
         print()
@@ -110,22 +111,23 @@ def reduction(basis: Sequence[Sequence[int]], delta: float) -> Sequence[Sequence
 
     return [list(map(int, b)) for b in basis]
 
-def reduction_rec(basis: List[List[int]], delta: float) -> List[List[int]]:
+def reduction_ssa(basis: List[List[int]], delta: float) -> List[List[int]]:
     n = len(basis)
     basis = list(map(Vector, basis))
     ortho = gramschmidt(basis)
 
     k = 1
     new_basis = basis[:2]
-    new_ortho = basis[:2]
+    new_ortho = ortho[:2]
 
     zip_basis = basis[2:][::-1]
-    zip_ortho = basis[2:][::-1]
+    zip_ortho = ortho[2:][::-1]
 
     def mu(i: int, j: int) -> Fraction:
         return new_ortho[j].proj_coff(new_basis[i])
     
     while k < n:
+        print("k :", k)
         print("nb :", new_basis)
         print("no :", new_ortho)
         print()
@@ -151,6 +153,52 @@ def reduction_rec(basis: List[List[int]], delta: float) -> List[List[int]]:
 
     return [list(map(int, b)) for b in new_basis]
 
+
+def reduction_rec(basis: List[List[int]], delta: float) -> List[List[int]]:
+    n = len(basis)
+    basis = list(map(Vector, basis))
+    ortho = gramschmidt(basis)
+
+    new_basis = basis[:2]
+    new_ortho = ortho[:2]
+
+    zip_basis = basis[2:][::-1]
+    zip_ortho = ortho[2:][::-1]
+
+    def mu(ba, orth) -> Fraction:
+        return orth.proj_coff(ba)
+    
+    def aux(k, new_basis, new_ortho):
+
+        print("k :", k)
+        print("nb :", new_basis)
+        print("no :", new_ortho)
+        print()
+
+        if k == n:
+            return new_basis
+        
+        for j in range(k - 1, -1, -1):
+            mu_kj = mu(new_basis[k], new_ortho[j])
+            if abs(mu_kj) > 0.5:
+                new_basis[-1] -= new_basis[j] * round(mu_kj)
+                new_ortho = gramschmidt(new_basis)
+
+        if new_ortho[-1].sdot() >= (delta - mu(new_basis[k], new_ortho[k - 1])**2) * new_ortho[-2].sdot():
+            k += 1
+            if k < n:
+                new_basis.append(zip_basis.pop())
+                new_ortho.append(zip_ortho.pop())
+        else:
+            new_basis[-1], new_basis[-2] = new_basis[-2], new_basis[-1]
+            new_ortho = gramschmidt(new_basis)
+            if k != 1:
+                zip_basis.append(new_basis.pop())
+                zip_ortho.append(new_ortho.pop())
+            k = max(k - 1, 1)
+        return aux(k, new_basis, new_ortho)
+    ret = aux(1, new_basis, new_ortho)
+    return [list(map(int, b)) for b in ret]
 # test 
 
 if __name__ == "__main__":
@@ -162,6 +210,13 @@ if __name__ == "__main__":
     
     print("##############")
     print(reduction_rec([[4.0, 1.0, 3.0,-1.0], 
+                         [2.0, 1.0,-3.0, 4.0], 
+                         [1.0, 0.0,-2.0, 7.0], 
+                         [6.0, 2.0, 9.0,-5.0]], 
+                         1))
+    
+    print("##############")
+    print(reduction_ssa([[4.0, 1.0, 3.0,-1.0], 
                          [2.0, 1.0,-3.0, 4.0], 
                          [1.0, 0.0,-2.0, 7.0], 
                          [6.0, 2.0, 9.0,-5.0]], 
