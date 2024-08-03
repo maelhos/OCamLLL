@@ -67,21 +67,21 @@ module Zipper = struct
     | curr :: rest -> (curr :: l1, rest)
 
   let modify f (l1, l2) =
-    match l2 with 
-    | to_modify :: rest -> (l1, f to_modify :: rest)
+    match l1 with 
+    | to_modify :: rest -> (f to_modify :: rest, l2)
     | [] -> (l1, l2)
 
   let insert x (l1, l2) =
-    (l1, x :: l2)
+    (x :: l1, l2)
 
   let remove (l1, l2) =
     match l1, l2 with 
     | [], [] -> ([], [])
-    | _ :: rest, [] -> (rest, [])
-    | _, _ :: rest -> (l1, rest)
+    | [], _ :: rest -> ([], rest)
+    | _ :: rest, _ -> (rest, l2)
   
-  let focused (_, l2) =
-    match l2 with 
+  let focused (l1, _) =
+    match l1 with 
     | [] -> raise Impossible
     | curr :: _ -> curr 
 

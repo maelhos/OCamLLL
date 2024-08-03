@@ -38,14 +38,14 @@ struct
 
   let lll ?(delta = F.one) (basis : mt) : mt =
     let _n = List.length basis in
-    let basis_zipper = Zipper.make basis in
-    let ortho_zipper = Zipper.make @@ gram_schmidt basis in
+    let basis_zipper = basis |> Zipper.make |> Zipper.right in
+    let ortho_zipper = basis |> gram_schmidt |> Zipper.make |> Zipper.right in
     let rec reduce (basis : t Zipper.t) (ortho : t Zipper.t) : t Zipper.t =
-      let mus = create_mus (Zipper.get_left ortho) (basis |> Zipper.get_left |> List.hd) in
+      let mus = create_mus (ortho |> Zipper.get_left |> List.tl) (Zipper.focused basis) in
       let mukkm1 = List.hd mus in
-      let new_basis_vec = create_new_basis mus (Zipper.get_left basis) (Zipper.focused basis) in
+      let new_basis_vec = create_new_basis mus (basis |> Zipper.get_left |> List.tl) (Zipper.focused basis) in
       let new_ortho_vec = Zipper.get_left basis |> gram_schmidt |> List.hd in
-      let basis_with_vec = Zipper.insert new_basis_vec basis in
+      let basis_with_vec = basis |> Zipper.remove |> Zipper.insert new_basis_vec in
       if F.(compare (norm new_ortho_vec) (mul (mul mukkm1 mukkm1 |> sub delta) (ortho |> Zipper.focused |> norm)) < 0) then
         begin
         let new_basis = Zipper.swap_heads basis_with_vec in 
