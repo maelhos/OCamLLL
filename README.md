@@ -18,7 +18,7 @@ dune exec OCamLLL
 If you want to use our library for your own code, you can find in `lib` the most important files : we redefine vectors and matrix using functors `MakeVector` (`lib/vector.ml`) and `MakeMatrix` (`lib/matrix.ml`), and then we implement Gram-Schmidt algorithm and LLL in their corresponding `ml` files.
 If you want to test our library on real use cases, you can check `test/*` and run :
 ```shell
-dune runtest [test/some_file]
+dune runtest
 ```
 
 # Requirements
