@@ -168,62 +168,46 @@ def reduction_rec(basis: List[List[int]], delta: float) -> List[List[int]]:
     def mu(ba, orth) -> Fraction:
         return orth.proj_coff(ba)
     
-    def aux(k, new_basis, new_ortho):
-
-        print("k :", k)
+    def aux(new_basis, new_ortho):
         print("nb :", new_basis)
         print("no :", new_ortho)
         print()
-
-        if k == n:
-            return new_basis
         
-        for j in range(k - 1, -1, -1):
-            mu_kj = mu(new_basis[k], new_ortho[j])
+        #def aux2()
+        for j in range(len(new_basis[:-2]), -1, -1):
+            mu_kj = mu(new_basis[-1], new_ortho[j])
             if abs(mu_kj) > 0.5:
                 new_basis[-1] -= new_basis[j] * round(mu_kj)
-                new_ortho = gramschmidt(new_basis)
 
-        if new_ortho[-1].sdot() >= (delta - mu(new_basis[k], new_ortho[k - 1])**2) * new_ortho[-2].sdot():
-            k += 1
-            if k < n:
+        new_ortho = gramschmidt(new_basis)
+
+        if new_ortho[-1].sdot() >= (delta - mu(new_basis[-1], new_ortho[-2])**2) * new_ortho[-2].sdot():
+            if len(new_basis) < n:
                 new_basis.append(zip_basis.pop())
                 new_ortho.append(zip_ortho.pop())
+            else: return new_basis
         else:
             new_basis[-1], new_basis[-2] = new_basis[-2], new_basis[-1]
             new_ortho = gramschmidt(new_basis)
-            if k != 1:
+            if len(new_basis) > 2:
                 zip_basis.append(new_basis.pop())
                 zip_ortho.append(new_ortho.pop())
-            k = max(k - 1, 1)
-        return aux(k, new_basis, new_ortho)
-    ret = aux(1, new_basis, new_ortho)
+        return aux(new_basis, new_ortho)
+    
+    # k = len(new_basis) - 1
+    ret = aux(new_basis, new_ortho)
     return [list(map(int, b)) for b in ret]
 # test 
 
 if __name__ == "__main__":
-    print(reduction([[4.0, 1.0, 3.0,-1.0], 
-                     [2.0, 1.0,-3.0, 4.0], 
-                     [1.0, 0.0,-2.0, 7.0], 
-                     [6.0, 2.0, 9.0,-5.0]], 
-                     1))
     
     print("##############")
-    print(reduction_rec([[4.0, 1.0, 3.0,-1.0], 
-                         [2.0, 1.0,-3.0, 4.0], 
-                         [1.0, 0.0,-2.0, 7.0], 
-                         [6.0, 2.0, 9.0,-5.0]], 
+    print(reduction_rec([[1.0, 1.0, 1.0], 
+                         [-1.0, 0.0, 2.0], 
+                         [3.0, 5.0, 6.0]], 
                          1))
     
     print("##############")
-    print(reduction_ssa([[4.0, 1.0, 3.0,-1.0], 
-                         [2.0, 1.0,-3.0, 4.0], 
-                         [1.0, 0.0,-2.0, 7.0], 
-                         [6.0, 2.0, 9.0,-5.0]], 
-                         1))
-    
-    print("##############")
-    print(list(matrix([[4, 1, 3,-1], 
-                         [2, 1,-3, 4], 
-                         [1, 0,-2, 7], 
-                         [6, 2, 9,-5]]).LLL()))
+    print(list(matrix([[1, 1, 1], 
+                         [-1, 0, 2], 
+                         [3, 5, 6]]).LLL()))
