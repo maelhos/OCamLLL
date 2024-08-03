@@ -2,6 +2,8 @@ module type MakeMatrix = functor (F : Vector.Field) ->
 sig
 	type mt = F.t array list
 
+	val half : F.t
+
 	val gram_schmidt : mt -> mt
 	val pp_matrix : sep:char -> (Format.formatter -> F.t -> unit) -> mt -> unit
 	val lll : ?delta:F.t -> mt -> mt
