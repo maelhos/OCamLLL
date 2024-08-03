@@ -10,6 +10,8 @@ module type Field = sig
 	val div : t -> t -> t
 	val neg : t -> t
 	val compare : t -> t -> int
+	val abs : t -> t
+	val to_string : t -> string
 end
 
 
